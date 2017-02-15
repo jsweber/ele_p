@@ -18,7 +18,7 @@
 		</div>
 		<div class="ball-container">
 			<div v-for="ball in balls" v-show="ball.show" transition="drop" class="ball">
-				<div class="inner"></div>
+				<div class="inner inner-hook"></div>
 			</div>
 		</div>
 	</div>
@@ -28,6 +28,24 @@
 		data(){
 			return {
 				balls:[
+					{
+						show:false
+					},
+					{
+						show:false
+					},
+					{
+						show:false
+					},
+					{
+						show:false
+					},
+					{
+						show:false
+					},
+					{
+						show:false
+					},
 					{
 						show:false
 					},
@@ -111,32 +129,48 @@
 			}
 
 		},
-		transition:{
+		transitions:{
 			drop:{
 				beforeEnter(el){
 					let count = this.balls.length;
+					console.log("before");
 					while(count--){
-						let ball = this.balls[i];
+						let ball = this.balls[count];
 						if(ball.show){
 							let rect = ball.el.getBoundingClientRect();
 							let x = rect.left - 32;
 							let y = -(window.innerHeight - rect.top -22);
-							el.style.display = "";
-							el.style.webkitTransform = `translate3d(0,${y}px1,0)`;
-							el.style.transform = `translate3d(0,${y}px1,0)`;
-
+							el.style.display = "none";
+							el.style.webkitTransform = 'translate3d(0,'+ y +'px,0)';
+							el.style.transform = 'translate3d(0,'+ y +'px,0)';
+							let inner = el.getElementsByClassName("inner-hook")[0];
+							inner.style.webkitTransform = 'translate3d('+x+'px,0,0)';
+							inner.style.transform = 'translate3d('+x+'px,0,0)';
+							console.log(x,y);
 						}
-
-
 					}
 				},
 				enter(el){
+					let rf = el.offsetHeight; //这句不加不行，浏览器不会重新渲染，动画不出来，还要配合nextTick，暂时怀疑不这么写的化，浏览器不会执行beforeEnter的渲染，导致没有动画，
+					this.$nextTick(()=>{
+						el.style.webkitTransform = 'translate3d(0,0,0)';
+						el.style.transform = 'translate3d(0,0,0)';
+						let inner = el.getElementsByClassName("inner-hook")[0];
+						inner.style.webkitTransform = 'translate3d(0,0,0)';
+						inner.style.transform = 'translate3d(0,0,0)';
+						console.log("enter");
+
+					});
 					
 				},
 				afterEnter(el){
-
+					let ball = this.dropBalls.shift();
+					if(ball){
+						ball.show = false;
+						el.style.display ="none";
+					}
+					console.log('after');
 				}
-
 			}
 		}
 
@@ -271,14 +305,14 @@
 			z-index:200;
 
 			&.drop-transition{
-				transition:all 0.4s;
+				transition:all 0.4s cubic-bezier(0.49,-0.29,0.75,0.41);
 
 				.inner{
 					width:16px;
 					height:16px;
 					border-radius:50%;
 					background:rgb(0,160,220);
-					transition:all 0.4s;
+					transition:all 0.4s linear;
 				}
 			}
 		}

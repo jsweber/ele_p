@@ -112,7 +112,10 @@ export default {
 	},
 	methods:{
 		_drop(target){
-			this.$refs.shopcart.drop(target);
+			//异步执行小球丢出去的动画，不要和水平滚动的小球一起执行，优化
+			this.$nextTick(()=>{
+				this.$refs.shopcart.drop(target);
+			});
 		},
 		selectMenu:function(index,event){
 			//原生的事件对象是没有_constructed属性的，避免pc上点击触发两次

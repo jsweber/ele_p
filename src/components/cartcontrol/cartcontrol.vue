@@ -61,7 +61,7 @@
 		//停止状态的样式
 		&.move-transition{
 			opacity:1;
-			transform:translate3D(0,0,0);
+			transform:translate3d(0,0,0);
 			.inner{
 				display:inline-block;
 				line-height:24px;
@@ -75,7 +75,7 @@
 		//进入和离开的样式，离开是回滚
 		&.move-enter,&.move-leave{
 			opacity:0;
-			transform:translate3D(24px,0,0);
+			transform:translate3d(24px,0,0);
 
 			.inner{
 				transform:rotate(180deg);
