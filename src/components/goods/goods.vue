@@ -27,6 +27,9 @@
     							<span class="new">￥{{food.price}}</span>
     							<span v-show="food.oldPrice" class="old">￥{{food.oldPrice}}</span>
     						</div>
+    						<div class="cartcontrol-wrapper">
+    							<cartcontrol :food="food"></cartcontrol>
+    						</div>
     					</div>
     				</li>
     			</ul>
@@ -34,13 +37,15 @@
 
     	</ul>
     </div>
-    <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+    <!-- v-ref 子组件定位 -->
+    <shopcart v-ref:shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   </div>
 </template>
 
 <script>
 import BScroll from "better-scroll";
 import shopcart from "../shopcart/shopcart";
+import cartcontrol from "../cartcontrol/cartcontrol";
 
 const ERRO_OK = 0;
 
@@ -58,7 +63,13 @@ export default {
 		}
 	},
 	components:{
-		shopcart
+		shopcart,
+		cartcontrol
+	},
+	events:{
+		'cart.add'(target){
+			this._drop(target);
+		}
 	},
 	computed:{
 		currentIndex:function(){
@@ -72,6 +83,18 @@ export default {
 
 			}
 			return this.scrollY;
+		},
+		selectFoods(){
+			let foods = [];
+			this.goods.forEach((good)=>{
+				good.foods.forEach((food)=>{
+					if(food.count){
+						foods.push(food);
+					}
+				})
+			});
+
+			return foods;
 		}
 	},
 	created(){
@@ -88,6 +111,9 @@ export default {
 		})
 	},
 	methods:{
+		_drop(target){
+			this.$refs.shopcart.drop(target);
+		},
 		selectMenu:function(index,event){
 			//原生的事件对象是没有_constructed属性的，避免pc上点击触发两次
 			if(!event._constructed){
@@ -105,6 +131,7 @@ export default {
 				click:true  //默认是不能点击的
 			});
 			this.foodsScroll = new BScroll(this.$els.foodsWrapper,{
+				click:true,
 				probeType:3  //加了这个参数就能返回坐标，详情看下面的代码返回的pos
 			});
 
@@ -222,6 +249,7 @@ export default {
 		}
 		.content{
 			flex:1;
+			position:relative;
 
 			.name{
 				margin:2px 0 8px 0;
@@ -261,6 +289,12 @@ export default {
 					font-size:10px;
 					color:rgb(147,153,159);
 				}
+			}
+
+			.cartcontrol-wrapper{
+				position:absolute;
+				right:0;
+				bottom:12px;
 			}
 		}
 	}

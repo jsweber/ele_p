@@ -16,10 +16,31 @@
 				<div class="pay" :class="payClass">{{payDesc}}</div>
 			</div>
 		</div>
+		<div class="ball-container">
+			<div v-for="ball in balls" v-show="ball.show" transition="drop" class="ball">
+				<div class="inner"></div>
+			</div>
+		</div>
 	</div>
-</template>>
+</template>
 <script>
 	export default{
+		data(){
+			return {
+				balls:[
+					{
+						show:false
+					},
+					{
+						show:false
+					},
+					{
+						show:false
+					}
+				],
+				dropBalls:[]
+			}
+		},
 		props:{
 			deliveryPrice:{
 				type:Number,
@@ -73,6 +94,49 @@
 				}else if(this.totalPrice >= this.minPrice){
 					return "enough";
 				}
+			}
+		},
+		methods:{
+			drop(el){
+				for(let i=0;i<this.balls.length;i++){
+					let ball = this.balls[i];
+					if(!ball.show){
+						ball.show = true;
+						ball.el = el;
+						this.dropBalls.push(ball);
+						return;
+					}
+
+				}
+			}
+
+		},
+		transition:{
+			drop:{
+				beforeEnter(el){
+					let count = this.balls.length;
+					while(count--){
+						let ball = this.balls[i];
+						if(ball.show){
+							let rect = ball.el.getBoundingClientRect();
+							let x = rect.left - 32;
+							let y = -(window.innerHeight - rect.top -22);
+							el.style.display = "";
+							el.style.webkitTransform = `translate3d(0,${y}px1,0)`;
+							el.style.transform = `translate3d(0,${y}px1,0)`;
+
+						}
+
+
+					}
+				},
+				enter(el){
+					
+				},
+				afterEnter(el){
+
+				}
+
 			}
 		}
 
@@ -199,5 +263,31 @@
 		}
 	}
 
+	.ball-container{
+		.ball{
+			position:fixed;
+			left:32px;
+			bottom:22px;
+			z-index:200;
+
+			&.drop-transition{
+				transition:all 0.4s;
+
+				.inner{
+					width:16px;
+					height:16px;
+					border-radius:50%;
+					background:rgb(0,160,220);
+					transition:all 0.4s;
+				}
+			}
+		}
+
+		.inner{
+
+
+		}
+
+	}
 
 </style>
