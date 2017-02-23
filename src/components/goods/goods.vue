@@ -12,7 +12,7 @@
     		<li v-for="item in goods" class="food-list food-list-hook">
     			<h1 class="title">{{item.name}}</h1>
     			<ul>
-    				<li v-for="food in item.foods" class="food-item">
+    				<li v-for="food in item.foods" class="food-item" @click="selectFood(food,$event)">
     					<div class="icon">
     						<img :src="food.icon" width="57">
     					</div>
@@ -24,7 +24,7 @@
     							<span>好评率{{food.rating}}%</span>
     						</div>
     						<div class="price">
-    							<span class="new">￥{{food.price}}</span>
+    							<span class="now">￥{{food.price}}</span>
     							<span v-show="food.oldPrice" class="old">￥{{food.oldPrice}}</span>
     						</div>
     						<div class="cartcontrol-wrapper">
@@ -40,12 +40,14 @@
     <!-- v-ref 子组件定位 -->
     <shopcart v-ref:shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   </div>
+  <food :food="selectedFood" v-ref:food></food>
 </template>
 
 <script>
 import BScroll from "better-scroll";
 import shopcart from "../shopcart/shopcart";
 import cartcontrol from "../cartcontrol/cartcontrol";
+import food from "../food/food";
 
 const ERRO_OK = 0;
 
@@ -54,7 +56,8 @@ export default {
 		return {
 			goods:[],
 			heightArr:[],
-			scrollY:0
+			scrollY:0,
+			selectedFood:{}
 		}
 	},
 	props:{
@@ -64,7 +67,8 @@ export default {
 	},
 	components:{
 		shopcart,
-		cartcontrol
+		cartcontrol,
+		food
 	},
 	events:{
 		'cart.add'(target){
@@ -111,6 +115,11 @@ export default {
 		})
 	},
 	methods:{
+		selectFood(food,event){
+			if(!event._constructed) return;
+			this.selectedFood = food;
+			this.$refs.food.show();
+		},
 		_drop(target){
 			//异步执行小球丢出去的动画，不要和水平滚动的小球一起执行，优化
 			this.$nextTick(()=>{
@@ -278,11 +287,11 @@ export default {
 					margin-right:12px;
 				}
 			}
-			.prize{
+			.price{
 
 				font-weight:700;
 
-				.new{
+				.now{
 					margin-left:8px;
 					font-size:14px;
 					color:rgb(240,20,20);
